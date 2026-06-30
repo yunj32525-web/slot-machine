@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Slot Machine 3x3 Mobile</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .machine {
+    width: min(1200px, 100vw);
+    min-height: 100vh;
+    position: relative;
+    background: #ffffff;
+    padding: 56px 20px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .title-bar {
+    width: min(580px, 86vw);
+    height: clamp(58px, 10vw, 82px);
+    background: #000000;
+    color: #ffffff;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(36px, 8vw, 58px);
+    font-weight: 500;
+  }
+
+  .reels {
+    margin-top: clamp(34px, 8vw, 48px);
+    display: grid;
+    grid-template-columns: repeat(3, clamp(78px, 24vw, 105px));
+    grid-template-rows: repeat(3, clamp(78px, 24vw, 105px));
+    gap: clamp(10px, 3vw, 18px);
+  }
+
+  .slot {
+    width: clamp(78px, 24vw, 105px);
+    height: clamp(78px, 24vw, 105px);
+    border: 3px solid #111;
+    border-radius: 4px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(38px, 12vw, 50px);
+    user-select: none;
+  }
+
+  .jackpot-slot {
+    background: #fff6cc;
+    border-color: #d8a000;
+    box-shadow: 0 0 12px #d8a000;
+  }
+
+  .start-button {
+    margin-top: clamp(28px, 7vw, 44px);
+    width: min(165px, 42vw);
+    height: clamp(58px, 13vw, 72px);
+    background: #000;
+    color: white;
+    border: none;
+    font-size: clamp(26px, 7vw, 36px);
+    cursor: pointer;
+  }
+
+  .start-button:hover { background: #222; }
+  .start-button:active { transform: translateY(2px); }
+
+  .jackpot-text {
+    margin-top: 18px;
+    text-align: center;
+    font-size: clamp(28px, 8vw, 38px);
+    font-weight: 900;
+    color: #d8a000;
+    min-height: 48px;
+  }
+
+  .copy-area {
+    margin-top: 18px;
+    width: min(640px, 92vw);
+    text-align: center;
+  }
+
+  .current-result-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .current-result {
+    width: 100%;
+    min-height: 78px;
+    border: 2px solid #111;
+    border-radius: 4px;
+    padding: 10px 16px;
+    font-size: clamp(16px, 4.4vw, 20px);
+    line-height: 1.5;
+    background: #fff;
+    color: #111;
+    white-space: pre-line;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    word-break: keep-all;
+  }
+
+  .copy-button {
+    margin-top: 10px;
+    padding: 9px 22px;
+    font-size: 18px;
+    background: white;
+    color: black;
+    border: 2px solid #111;
+    cursor: pointer;
+  }
+
+  .copy-button:hover { background: #eee; }
+
+  @media (max-width: 480px) {
+    body {
+      align-items: flex-start;
+    }
+
+    .machine {
+      padding-top: 28px;
+      padding-bottom: 24px;
+    }
+
+    .copy-area {
+      margin-top: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="machine">
+  <div class="title-bar">Machine</div>
+
+  <div class="reels">
+    <div class="slot" id="slot0">7</div>
+    <div class="slot" id="slot1">7</div>
+    <div class="slot" id="slot2">7</div>
+    <div class="slot" id="slot3">7</div>
+    <div class="slot" id="slot4">7</div>
+    <div class="slot" id="slot5">7</div>
+    <div class="slot" id="slot6">7</div>
+    <div class="slot" id="slot7">7</div>
+    <div class="slot" id="slot8">7</div>
+  </div>
+
+  <button class="start-button" onclick="spin()">Start</button>
+
+  <div class="jackpot-text" id="jackpotText">JACKPOT!</div>
+
+  <div class="copy-area">
+    <div class="current-result-label">결과</div>
+    <div class="current-result" id="currentResult">결과 : 777 / 777 / 777 [잭팟!]</div>
+    <button class="copy-button" id="copyButton" onclick="copyResult()">결과 복사</button>
+  </div>
+</div>
+
+<script>
+  const symbols = ["🍒", "💎", "7", "💣"];
+  let latestResultText = "결과 : 777 / 777 / 777 [잭팟!]";
+
+  const winningLines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+
+  function randomSymbol() {
+    return symbols[Math.floor(Math.random() * symbols.length)];
+  }
+
+  function spin() {
+    const slots = [];
+
+    for (let i = 0; i < 9; i++) {
+      slots[i] = randomSymbol();
+      const slotElement = document.getElementById("slot" + i);
+      slotElement.textContent = slots[i];
+      slotElement.classList.remove("jackpot-slot");
+    }
+
+    const jackpotLines = findJackpotLines(slots);
+    const isJackpot = jackpotLines.length > 0;
+
+    if (isJackpot) {
+      jackpotLines.forEach(function(line) {
+        line.forEach(function(index) {
+          document.getElementById("slot" + index).classList.add("jackpot-slot");
+        });
+      });
+    }
+
+    const row1 = slots[0] + slots[1] + slots[2];
+    const row2 = slots[3] + slots[4] + slots[5];
+    const row3 = slots[6] + slots[7] + slots[8];
+
+    const jackpotText = document.getElementById("jackpotText");
+    const currentResult = document.getElementById("currentResult");
+
+    let resultLine = "결과 : " + row1 + " / " + row2 + " / " + row3;
+
+    if (isJackpot) {
+      jackpotText.textContent = "JACKPOT!";
+      resultLine += " [잭팟!]";
+    } else {
+      jackpotText.textContent = "";
+    }
+
+    latestResultText = resultLine;
+    currentResult.textContent = resultLine;
+  }
+
+  function findJackpotLines(slots) {
+    return winningLines.filter(function(line) {
+      const a = slots[line[0]];
+      const b = slots[line[1]];
+      const c = slots[line[2]];
+      return a === b && b === c;
+    });
+  }
+
+  function copyResult() {
+    const copyButton = document.getElementById("copyButton");
+
+    navigator.clipboard.writeText(latestResultText).then(function() {
+      copyButton.textContent = "완료";
+      setTimeout(function() {
+        copyButton.textContent = "결과 복사";
+      }, 1000);
+    }).catch(function() {
+      alert("복사에 실패했습니다.");
+    });
+  }
+</script>
+
+</body>
+</html>
