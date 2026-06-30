@@ -154,15 +154,15 @@
   <div class="title-bar">Machine</div>
 
   <div class="reels">
-    <div class="slot" id="slot0">7</div>
-    <div class="slot" id="slot1">7</div>
-    <div class="slot" id="slot2">7</div>
-    <div class="slot" id="slot3">7</div>
-    <div class="slot" id="slot4">7</div>
-    <div class="slot" id="slot5">7</div>
-    <div class="slot" id="slot6">7</div>
-    <div class="slot" id="slot7">7</div>
-    <div class="slot" id="slot8">7</div>
+    <div class="slot" id="slot0">7️⃣</div>
+    <div class="slot" id="slot1">7️⃣</div>
+    <div class="slot" id="slot2">7️⃣</div>
+    <div class="slot" id="slot3">7️⃣</div>
+    <div class="slot" id="slot4">7️⃣</div>
+    <div class="slot" id="slot5">7️⃣</div>
+    <div class="slot" id="slot6">7️⃣</div>
+    <div class="slot" id="slot7">7️⃣</div>
+    <div class="slot" id="slot8">7️⃣</div>
   </div>
 
   <button class="start-button" onclick="spin()">Start</button>
@@ -171,9 +171,9 @@
 
   <div class="copy-area">
     <div class="current-result-label">결과</div>
-    <div class="current-result" id="currentResult">777
-777
-777
+    <div class="current-result" id="currentResult">7️⃣7️⃣7️⃣
+7️⃣7️⃣7️⃣
+7️⃣7️⃣7️⃣
 
 [잭팟!]</div>
     <button class="copy-button" id="copyButton" onclick="copyResult()">결과 복사</button>
@@ -181,8 +181,8 @@
 </div>
 
 <script>
-  const symbols = ["🍒", "💎", "7", "💣"];
-  let latestResultText = "777\n777\n777\n\n[잭팟!]";
+  const symbols = ["🍒", "💎", "7️⃣", "💣"];
+  let latestResultText = "7️⃣7️⃣7️⃣\n7️⃣7️⃣7️⃣\n7️⃣7️⃣7️⃣\n\n[잭팟!]";
 
   const winningLines = [
     [0, 1, 2],
@@ -253,7 +253,7 @@ ${row3}`;
       const b = slots[line[1]];
       const c = slots[line[2]];
       return a === b && b === c;
-    }); 
+    });
   }
 
   function copyResult() {
